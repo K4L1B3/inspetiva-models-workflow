@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Frutify IS-01</title>
+<style>
+  :root { --grafite:#2c2c2a; --ambar:#ef9f27; --osso:#f1efe8; --cinza:#8a8882; }
+  * { box-sizing:border-box; margin:0; }
+  body { background:var(--grafite); color:var(--osso); height:100vh;
+         font-family:Arial,Helvetica,sans-serif; display:flex; }
+  @media (max-width:820px) { body { flex-direction:column; height:auto } }
+  main { flex:1; min-width:0; display:flex; align-items:center; justify-content:center;
+         padding:1vh; overflow:hidden; }
+  main img { width:100%; height:100%; max-width:100%; max-height:98vh; object-fit:contain;
+             border-radius:8px; background:#000; }
+  aside { width:20vw; min-width:260px; padding:4vh 2.5vh;
+          border-left:2px solid rgba(241,239,232,.12); display:flex;
+          flex-direction:column; gap:3vh; }
+  @media (max-width:820px) { aside { width:100%; border:0 } }
+  h1 { font-size:15px; letter-spacing:.3em; color:var(--ambar); font-weight:700; }
+  .num { font-size:64px; line-height:.9; font-weight:700; }
+  .rot { font-size:11px; letter-spacing:.2em; color:var(--cinza);
+         text-transform:uppercase; margin-top:6px; }
+  ul { list-style:none; padding:0; display:flex; flex-direction:column; gap:8px; }
+  li { display:flex; justify-content:space-between; font-size:18px;
+       border-bottom:1px solid rgba(241,239,232,.1); padding-bottom:6px; }
+  li b { color:var(--ambar); }
+  #estado { margin-top:auto; font-size:12px; color:var(--cinza);
+            letter-spacing:.12em; text-transform:uppercase; line-height:1.6; }
+  #estado.ruim { color:#e2643c; text-transform:none; letter-spacing:0; }
+  a { color:var(--cinza); font-size:11px; }
+</style>
+</head>
+<body>
+  <main><img id="quadro" src="/video" alt="inferencia ao vivo"></main>
+  <aside>
+    <h1>FRUTIFY IS-01</h1>
+    <div>
+      <div class="num" id="detectados">—</div>
+      <div class="rot">frutos detectados</div>
+    </div>
+    <div>
+      <div class="num" id="classificados" style="font-size:34px">—</div>
+      <div class="rot">classificados / inconclusivos</div>
+    </div>
+    <ul id="contagem"></ul>
+    <div id="estado">carregando modelo…</div>
+    <a href="/video-cru">alinhar bandeja (ROI) →</a>
+  </aside>
+
+<script>
+async function tick() {
+  try {
+    const s = await (await fetch('/status')).json();
+    const est = document.getElementById('estado');
+    est.classList.toggle('ruim', !!s.erro || !s.camera);
+    if (s.erro) { est.textContent = s.erro; return; }
+    if (!s.camera) { est.textContent = 'Camera sem sinal. Confira o cabo USB.'; return; }
+    if (!s.pronto) { est.textContent = 'carregando modelo…'; return; }
+
+    detectados.textContent = s.detectados;
+    classificados.textContent = `${s.classificados} / ${s.inconclusivos}`;
+    contagem.innerHTML = Object.entries(s.contagem)
+      .map(([k, v]) => `<li>${k}<b>${v}</b></li>`).join('');
+    est.textContent = `${s.ms} ms · ${(1000 / Math.max(s.ms, 1)).toFixed(1)} fps · ${s.device}`;
+  } catch (e) {
+    document.getElementById('estado').textContent = 'servidor offline';
+  }
+}
+tick();
+setInterval(tick, 500);
+</script>
+</body>
+</html>
