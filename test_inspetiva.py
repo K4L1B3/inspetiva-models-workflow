@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import pytest
 
-from frutify import config, modelo
+from inspetiva import config, modelo
 
 
 def det(cls, conf, x=100, y=100, w=60, h=60):

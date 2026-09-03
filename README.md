@@ -1,4 +1,4 @@
-# Frutify IS-01
+# Inspetiva IS-01
 
 Estação de demonstração (Agrinordeste): câmera USB + **inferência 100% local**.
 Nada sai da máquina — sem API key, sem internet, sem servidor de inferência.
@@ -17,7 +17,7 @@ Requer [uv](https://docs.astral.sh/uv/) e uma webcam USB.
 ```bash
 uv sync                 # cria .venv e instala tudo
 cp .env.example .env    # ajuste a câmera e o ROI
-uv run frutify          # sobe em http://0.0.0.0:8000
+uv run inspetiva        # sobe em http://0.0.0.0:8000
 ```
 
 Testes: `uv run pytest -q`
@@ -38,7 +38,7 @@ O detector devolve as caixas; cada recorte passa pelo classificador. Abaixo de
 `LIMIAR_CLASSIFICACAO` a caixa vira "inconclusivo" (cinza).
 
 O classificador é o modelo do Roboflow rodando localmente: o `.onnx` foi
-baixado uma vez e `frutify/modelo.py` reproduz o pré-processo deles (RGB,
+baixado uma vez e `inspetiva/modelo.py` reproduz o pré-processo deles (RGB,
 `/255`, normalização ImageNet, stretch para 224×224). Conferido contra
 `serverless.roboflow.com` em 40 imagens do split de teste — **40/40 idênticos**.
 A ordem de `CLASSES_DOENCA` no `config.py` é o `CLASS_MAP` do export e não pode
@@ -71,15 +71,15 @@ troque por `onnxruntime-gpu`.
 ## Estrutura
 
 ```
-frutify/
+inspetiva/
   config.py    env, paleta, nomes das classes
   camera.py    thread de captura, ROI, stream MJPEG
   modelo.py    dois estágios ultralytics, limiar, anotação, thread de inferência
-  main.py      rotas FastAPI (entry point `frutify`)
+  main.py      rotas FastAPI (entry point `inspetiva`)
   static/      index.html
 models/        pesos locais
 fixtures/      uma imagem por classe, do split de teste — usadas no pytest
-test_frutify.py
+test_inspetiva.py
 ```
 
 ## Checagem antes da feira

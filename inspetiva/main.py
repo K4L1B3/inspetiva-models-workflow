@@ -1,5 +1,5 @@
 """
-Frutify IS-01 — inferencia local, ao vivo.
+Inspetiva IS-01 — inferencia local, ao vivo.
 
 Abra http://localhost:8000 : video em tempo real com as caixas do modelo.
 Nada sai da maquina — os pesos estao em models/.
@@ -21,7 +21,7 @@ async def lifespan(_app):
     yield
 
 
-app = FastAPI(title="Frutify IS-01", lifespan=lifespan)
+app = FastAPI(title="Inspetiva IS-01", lifespan=lifespan)
 
 MJPEG = "multipart/x-mixed-replace; boundary=frame"
 
@@ -56,7 +56,7 @@ def status():
 
 
 def run():
-    """Entry point: `uv run frutify`."""
+    """Entry point: `uv run inspetiva`."""
     import uvicorn
     uvicorn.run(app, host=config.HOST, port=config.PORT, log_level="warning")
 
