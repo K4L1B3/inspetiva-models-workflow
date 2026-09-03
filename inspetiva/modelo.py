@@ -176,10 +176,11 @@ class Motor:
             self.erro = f"falha ao carregar os pesos: {exc}"
             return
 
+        seq = -1
         while True:
-            frame = camera.pegar()
-            if frame is None:
-                time.sleep(0.1)
+            seq, frame = camera.pegar(seq)
+            if frame is None:      # nada novo: nao reprocessa o mesmo quadro
+                time.sleep(0.01)
                 continue
 
             inicio = time.time()

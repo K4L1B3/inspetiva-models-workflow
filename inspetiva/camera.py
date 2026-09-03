@@ -14,6 +14,7 @@ class Camera:
 
     def __init__(self):
         self.frame = None
+        self.seq = 0          # numero do frame: so incrementa quando chega um novo
         self.lock = threading.Lock()
         self.ok = False
         self.cap = None
@@ -55,11 +56,19 @@ class Camera:
                 continue
             with self.lock:
                 self.frame = frame
+                self.seq += 1
                 self.ok = True
 
-    def pegar(self):
+    def pegar(self, desde=-1):
+        """Devolve (seq, frame). O frame vem None se nada mudou desde `desde`.
+
+        Evita que o consumidor reprocesse o mesmo quadro: sem isso o motor
+        roda o modelo em loop aberto sobre o frame parado, queimando CPU.
+        """
         with self.lock:
-            return None if self.frame is None else self.frame.copy()
+            if self.frame is None or self.seq == desde:
+                return self.seq, None
+            return self.seq, self.frame.copy()
 
 
 camera = Camera()
@@ -77,7 +86,7 @@ def aplicar_roi(frame):
 
 def gerar_mjpeg(marcar_roi: bool):
     while True:
-        frame = camera.pegar()
+        _, frame = camera.pegar()
         if frame is None:
             time.sleep(0.05)
             continue
